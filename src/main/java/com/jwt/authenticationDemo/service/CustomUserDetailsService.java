@@ -26,12 +26,17 @@ public class CustomUserDetailsService  implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                getRoles(user.getRoles())
+                user.getRoles()
+                        .stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getRole()))
+                        .collect(Collectors.toList())
         );
     }
 
-    public Collection<? extends GrantedAuthority> getRoles(Collection<Role> roles){
-        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole()))
-               .collect(Collectors.toList());
-    }
+//    Or
+//    public Collection<? extends GrantedAuthority> getRoles(Collection<Role> roles){
+//        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole()))
+//               .collect(Collectors.toList());
+//    }
+
 }

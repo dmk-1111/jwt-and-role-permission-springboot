@@ -15,10 +15,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
+
     @Autowired
     private JwtUtil jwtUtils;
+
     @Autowired
     private CustomUserDetailsService userDetailsService;
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -36,12 +39,20 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                                 null,
                                 userDetails.getAuthorities()
                         );
+
+                //This adds extra information from the HTTP request, such as:
+                //Remote IP address, Session ID It’s optional but useful for auditing/logging.
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                //Store authentication in SecurityContext
+                //It tells Spring Security: "This user is now authenticated for this request."
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
             System.out.println("Cannot set user authentication: " + e);
         }
+
+        //This line tells the server: continue processing the request with the next filter in the chain.
         filterChain.doFilter(request, response);
     }
     private String parseJwt(HttpServletRequest request) {

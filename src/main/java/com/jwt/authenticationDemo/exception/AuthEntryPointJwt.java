@@ -5,7 +5,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 public class AuthEntryPointJwt  implements AuthenticationEntryPoint {
     @Override
@@ -14,6 +19,9 @@ public class AuthEntryPointJwt  implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+        Map<String,Object> body = new HashMap<>();
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        body.put("message","Authentication Failed");
+        new ObjectMapper().writeValue(response.getOutputStream(),body);
     }
 }
